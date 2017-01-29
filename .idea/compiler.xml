@@ -21,8 +21,8 @@
     <bytecodeTargetLevel>
       <module name="polylabel-java_main" target="1.8" />
       <module name="polylabel-java_test" target="1.8" />
-      <module name="polylabel_main" target="1.7" />
-      <module name="polylabel_test" target="1.7" />
+      <module name="polylabel_main" target="1.8" />
+      <module name="polylabel_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
