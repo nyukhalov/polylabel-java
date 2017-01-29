@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/nyukhalov/polylabel-java/badge.svg?branch=master)](https://coveralls.io/github/nyukhalov/polylabel-java?branch=master)
+[![Build Status](https://travis-ci.org/nyukhalov/polylabel-java.svg?branch=master)](https://travis-ci.org/nyukhalov/polylabel-java) [![Coverage Status](https://coveralls.io/repos/github/nyukhalov/polylabel-java/badge.svg?branch=master)](https://coveralls.io/github/nyukhalov/polylabel-java?branch=master)
 
 Polylabel-java 
 ==============
