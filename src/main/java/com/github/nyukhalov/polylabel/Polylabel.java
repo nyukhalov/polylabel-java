@@ -13,17 +13,19 @@ public class Polylabel {
     public static Point polylabel(Polygon polygon, double precision) {
 
         // find the bounding box of the outer ring
-        double minX = 0, minY = 0, maxX = 0, maxY = 0;
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
         List<Position> outerRingCoordinates = polygon.getCoordinates().get(0);
-        for (int i = 0; i < outerRingCoordinates.size(); i++) {
-            Position p = outerRingCoordinates.get(i);
+        for (Position p: outerRingCoordinates) {
             double lon = p.getLongitude();
             double lat = p.getLatitude();
 
-            if (i == 0 || lon < minX) minX = lon;
-            if (i == 0 || lat < minY) minY = lat;
-            if (i == 0 || lon > maxX) maxX = lon;
-            if (i == 0 || lat > maxY) maxY = lat;
+            minX = StrictMath.min(minX, lon);
+            minY = StrictMath.min(minY, lat);
+            maxX = StrictMath.max(maxX, lon);
+            maxY = StrictMath.max(maxY, lat);
         }
 
         double width = maxX - minX;
@@ -31,10 +33,10 @@ public class Polylabel {
         double cellSize = Math.min(width, height);
         double h = cellSize / 2;
 
+        if (cellSize == 0) return Point.fromCoordinates(new double[] {minX, minY});
+
         // a priority queue of cells in order of their "potential" (max distance to polygon)
         PriorityQueue<Cell> cellQueue = new PriorityQueue<>(new CellComparator());
-
-        if (cellSize == 0) return Point.fromCoordinates(new double[] {minX, minY});
 
         // cover polygon with initial cells
         for (double x = minX; x < maxX; x += cellSize) {
@@ -78,8 +80,8 @@ public class Polylabel {
         double area = 0;
         double x = 0;
         double y = 0;
-        List<Position> points = polygon.getCoordinates().get(0);
 
+        List<Position> points = polygon.getCoordinates().get(0);
         for (int i = 0, len = points.size(), j = len - 1; i < len; j = i++) {
             Position a = points.get(i);
             Position b = points.get(j);
@@ -93,7 +95,12 @@ public class Polylabel {
             y += (aLat + bLat) * f;
             area += f * 3;
         }
-        if (area == 0) return new Cell(points.get(0).getLongitude(), points.get(0).getLatitude(), 0, polygon);
+
+        if (area == 0) {
+            Position p = points.get(0);
+            return new Cell(p.getLongitude(), p.getLatitude(), 0, polygon);
+        }
+
         return new Cell(x / area, y / area, 0, polygon);
     }
 
@@ -133,10 +140,7 @@ public class Polylabel {
             boolean inside = false;
             double minDistSq = Double.MAX_VALUE;
 
-            List<List<Position>> coordinates = polygon.getCoordinates();
-            for (int k = 0; k < coordinates.size(); k++) {
-                List<Position> ring = coordinates.get(k);
-
+            for (List<Position> ring: polygon.getCoordinates()) {
                 for (int i = 0, len = ring.size(), j = len - 1; i < len; j = i++) {
                     Position a = ring.get(i);
                     Position b = ring.get(j);
@@ -164,13 +168,11 @@ public class Polylabel {
             double dy = b.getLatitude() - y;
 
             if (dx != 0 || dy != 0) {
-
                 double t = ((px - x) * dx + (py - y) * dy) / (dx * dx + dy * dy);
 
                 if (t > 1) {
                     x = b.getLongitude();
                     y = b.getLatitude();
-
                 } else if (t > 0) {
                     x += dx * t;
                     y += dy * t;
